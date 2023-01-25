@@ -8,9 +8,9 @@ import ru.practicum.shareit.user.model.User;
 public class UserMapper {
     public User mapToUser(UserDto userDto) {
         User user = new User();
-        user.setId(user.getId());
-        user.setName(user.getName());
-        user.setEmail(user.getEmail());
+        user.setId(userDto.getId());
+        user.setName(userDto.getName());
+        user.setEmail(userDto.getEmail());
         return user;
     }
 

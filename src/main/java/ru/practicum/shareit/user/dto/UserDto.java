@@ -1,10 +1,10 @@
 package ru.practicum.shareit.user.dto;
 
 import lombok.*;
+import ru.practicum.shareit.markers.Marker;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -13,10 +13,12 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(of = "id")
 public class UserDto {
     private Long id;
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+    @NotBlank(groups = {Marker.Create.class},
+            message = "Имя пользователя не может быть пустым")
     private String name;
-    @NotNull
-    @NotBlank(message = "Email не может быть пустым")
-    @Email(message = "Указан некорректный email")
+    @NotBlank(groups = {Marker.Create.class},
+            message = "Email не может быть пустым")
+    @Email(groups = {Marker.Create.class, Marker.Update.class},
+            message = "Указан некорректный email")
     private String email;
 }
