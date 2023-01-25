@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.UserAlreadyExistsException;
 import ru.practicum.shareit.exception.UserNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
@@ -28,6 +29,7 @@ public class UserStorage implements UserService {
 
     @Override
     public UserDto update(UserDto userDto, Long userId) {
+        validateId(userId);
         userDto.setId(userId);
         User userOld = findUserById(userId);
         User userNew = userMapper.mapToUser(userDto);
@@ -44,13 +46,15 @@ public class UserStorage implements UserService {
     }
 
     @Override
-    public void delete(Long id) {
-        userRepository.delete(id);
+    public void delete(Long userId) {
+        validateId(userId);
+        userRepository.delete(userId);
     }
 
     @Override
-    public UserDto getUserById(Long id) {
-        return userMapper.mapToUserDto(userRepository.getUserById(id));
+    public UserDto getUserById(Long userId) {
+        validateId(userId);
+        return userMapper.mapToUserDto(userRepository.getUserById(userId));
     }
 
     private User updateUserData(User userNew, User userOld) {
@@ -65,6 +69,7 @@ public class UserStorage implements UserService {
     }
 
     private User findUserById(Long userId) {
+        validateId(userId);
         User user = userRepository.getUserById(userId);
         if (user == null) {
             throw new UserNotFoundException(
@@ -80,6 +85,15 @@ public class UserStorage implements UserService {
         if (userEmails.contains(user.getEmail())) {
             throw new UserAlreadyExistsException(
                     "Пользователь с email = " + user.getEmail() + " уже существует");
+        }
+    }
+
+    private void validateId(Long userId) {
+        if (userId == null) {
+            throw new ValidationException("id не может быть пустым");
+        }
+        if (userId <= 0) {
+            throw new ValidationException("id должен быть больше нуля");
         }
     }
 }
