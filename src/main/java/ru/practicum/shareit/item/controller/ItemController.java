@@ -9,12 +9,13 @@ import ru.practicum.shareit.markers.Marker;
 
 import java.util.Collection;
 
+import static ru.practicum.shareit.constants.HEADER_USER_ID;
+
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
-    private static final String HEADER_USER_ID = "X-Sharer-User-Id";
 
     @GetMapping
     public Collection<ItemDto> getAllItems(@RequestHeader(HEADER_USER_ID) Long ownerId) {
