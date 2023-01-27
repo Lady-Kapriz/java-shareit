@@ -9,7 +9,7 @@ import ru.practicum.shareit.markers.Marker;
 
 import java.util.Collection;
 
-import static ru.practicum.shareit.Constants.HEADER_USER_ID;
+import static ru.practicum.shareit.util.Constants.HEADER_USER_ID;
 
 @RestController
 @RequestMapping("/items")
