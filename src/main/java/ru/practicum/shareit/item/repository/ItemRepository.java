@@ -14,7 +14,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findByOwner(Long ownerId, Sort id);
 
     @Query(" select item from Item item " +
-            "where upper(item.name) like upper(concat('%), :text, '%)) " +
+            "where upper(item.name) like upper(concat('%', :text, '%')) " +
+            "or upper(item.description) like upper(concat('%', :text, '%')) " +
             "and item.available = true")
     List<Item> search(String text);
 }

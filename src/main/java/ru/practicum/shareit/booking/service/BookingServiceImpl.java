@@ -6,12 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.state.BookingState;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.booking.state.BookingState;
-import ru.practicum.shareit.exception.BookingNotFoundException;
 import ru.practicum.shareit.exception.NotValidDataException;
+import ru.practicum.shareit.exception.BookingNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -19,7 +19,6 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import static ru.practicum.shareit.booking.state.BookingState.APPROVED;
 import static ru.practicum.shareit.booking.state.BookingState.REJECTED;
 import static ru.practicum.shareit.util.Constants.CURRENT_DATA_TIME;
