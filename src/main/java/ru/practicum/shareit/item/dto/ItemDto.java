@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import ru.practicum.shareit.markers.Marker;
-import ru.practicum.shareit.request.model.ItemRequest;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
