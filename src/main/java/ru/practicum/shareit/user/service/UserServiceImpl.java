@@ -38,7 +38,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         User user = userMapper.mapToUser(userDto);
-        checkUniqueEmail(user);
         userDto.setId(userRepository.save(user).getId());
         return userDto;
     }

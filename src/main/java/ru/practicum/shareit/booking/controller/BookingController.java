@@ -19,11 +19,6 @@ import static ru.practicum.shareit.util.Constants.HEADER_USER_ID;
 public class BookingController {
     private final BookingService bookingService;
 
-    /*@Autowired
-    public BookingController (BookingService bookingService) {
-        this.bookingService = bookingService;
-    }*/
-
     @GetMapping("/{bookingId}")
     public BookingDto getById(@RequestHeader(HEADER_USER_ID) Long ownerId,
                               @PathVariable Long bookingId) {

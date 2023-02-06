@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,7 @@ import static ru.practicum.shareit.booking.state.BookingState.APPROVED;
 import static ru.practicum.shareit.booking.state.BookingState.REJECTED;
 import static ru.practicum.shareit.util.Constants.CURRENT_DATA_TIME;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -75,13 +77,16 @@ public class BookingServiceImpl implements BookingService {
             case PAST:
                 return bookingRepository.findUserBookingByPast(bookerId, CURRENT_DATA_TIME)
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+            case FUTURE:
+                return bookingRepository.findUserBookingByFuture(bookerId, CURRENT_DATA_TIME)
+                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case WAITING:
             case REJECTED:
                 return bookingRepository.findUserBookingByStatus(bookerId, bookingState)
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             default:
                 throw new NotValidDataException(String.format(
-                        "Статус %s не найден", bookingState));
+                        "Unknown state: %s", bookingState));
         }
     }
 
@@ -99,6 +104,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findItemBookingByPast(ownerId, CURRENT_DATA_TIME)
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case FUTURE:
+                log.info("future");
                 return bookingRepository.findItemBookingByFuture(ownerId, CURRENT_DATA_TIME)
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case WAITING:
@@ -107,7 +113,7 @@ public class BookingServiceImpl implements BookingService {
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             default:
                 throw new NotValidDataException(String.format(
-                        "Статус %s не найден", bookingState));
+                        "Unknown state: %s", bookingState));
         }
     }
 
@@ -118,7 +124,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkDataOf(Booking booking, Long ownerId) {
-        if (!booking.getItem().getOwner().equals(ownerId) && !booking.getBooker().getId().equals(ownerId)) {
+        log.info("чк дата");
+        if (!booking.getItem().getOwner().equals(ownerId) &&
+                !booking.getBooker().getId().equals(ownerId)) {
             throw new BookingNotFoundException(String.format(
                     "Пользователь с id = %s не является автоом бронирования %s или владельцем", ownerId, booking));
         }
@@ -133,7 +141,7 @@ public class BookingServiceImpl implements BookingService {
     private void checkDate(BookingCreateDto bookingCreateDto) {
         if (bookingCreateDto.getEnd().isBefore(bookingCreateDto.getStart())) {
             throw new NotValidDataException(String.format(
-                    "Ошибка валидации даты у вронирования = %s", bookingCreateDto));
+                    "Ошибка валидации даты у бронирования = %s", bookingCreateDto));
         }
     }
 

@@ -43,24 +43,27 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
 
     @Override
-    public Collection<ItemDtoGetResponse> getAllForOwnerId(Long ownerId) {
-        List<Item> items = itemRepository.findByOwner(ownerId, Sort.by(ASC, "id"));
+    public List<ItemDtoGetResponse> getAllForOwnerId(Long ownerId) {
+        List<Item> items = itemRepository
+                .findByOwner(ownerId, Sort.by(ASC, "id"));
         Map<Item, List<Comment>> commentsMap = commentRepository
                 .findByItemIn(items, Sort.by(ASC, "created"))
                 .stream()
                 .collect(groupingBy(Comment::getItem, toList()));
-        Map<Item, List<Booking>> bookingMap = bookingRepository
+        Map<Item, List<Booking>> bookingsMap = bookingRepository
                 .findByItemInAndStatus(items, APPROVED, Sort.by(DESC, "start"))
-                .stream().collect(groupingBy(Booking::getItem, toList()));
-        List<ItemDtoGetResponse> itemDtoResponses = new ArrayList<>();
+                .stream()
+                .collect(groupingBy(Booking::getItem, toList()));
+        List<ItemDtoGetResponse> itemDtoGetResponses =
+                new ArrayList<>();
         for (Item item : items) {
-            List<Booking> bookings = bookingMap.getOrDefault(item, List.of());
-            itemDtoResponses.add(itemMapper.toItemDtoForBookingAndCommentShort(item,
-                    getLastBooking(bookings, item, ownerId),
-                    getNextBooking(bookings, item, ownerId),
-                    extractionComment(commentsMap, item)));
+            List<Booking> bookings = bookingsMap.getOrDefault(item, List.of());
+            itemDtoGetResponses.add(itemMapper
+                    .toItemDtoForBookingAndCommentShort(item, getLastBooking(bookings, item, ownerId),
+                            getNextBooking(bookings, item, ownerId),
+                            extractionComment(commentsMap, item)));
         }
-        return itemDtoResponses;
+        return itemDtoGetResponses;
     }
 
     @Override
