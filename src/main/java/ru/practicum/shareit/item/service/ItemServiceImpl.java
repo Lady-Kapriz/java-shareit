@@ -82,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDtoGetResponse getByIdForBooking(Long itemId, Long ownerId) {
+    public ItemDtoGetResponse getItemByIdForBooking(Long itemId, Long ownerId) {
         Item item = findItemById(itemId);
         List<Booking> bookings = bookingRepository
                 .findByItemIdAndStatus(itemId, APPROVED, Sort.by(DESC, "start"));
@@ -136,7 +136,7 @@ public class ItemServiceImpl implements ItemService {
 
     private BookingDtoForItem getNextBooking(List<Booking> bookings, Item item, Long ownerId) {
         Optional<Booking> nextBooking = bookings.stream()
-                .filter(booking -> !booking.getStart().isAfter(LocalDateTime.now())).reduce((first, second) -> second);
+                .filter(booking -> booking.getStart().isAfter(LocalDateTime.now())).reduce((first, second) -> second);
         if (nextBooking.isEmpty() || !item.getOwner().equals(ownerId)) {
             return null;
         }
@@ -180,16 +180,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private void checkUserBooking(Long ownerId, Long itemId) {
-        if (bookingRepository.findUserBookingItem(ownerId, CURRENT_DATA_TIME).stream()
+        if (bookingRepository.findUserBookingItem(ownerId, LocalDateTime.now()).stream()
                 .noneMatch(booking -> booking.getItem().getId().equals(itemId))) {
             throw new NotValidDataException(String.format(
-                    "Пользователь с id = %s не брал в аренду вещь с id = %s", ownerId, itemId));
+                    "Пользователь с id: %s не брал в аренду вещь с id: %s", ownerId, itemId));
         }
     }
 
     private Comment updateCommentData(CommentDto commentDto, User author, Item item) {
         Comment comment = itemMapper.commentDtoToComment(commentDto);
-        comment.setId(comment.getId());
+        comment.setId(commentDto.getId());
         comment.setCreated(commentDto.getCreated());
         comment.setAuthor(author);
         comment.setItem(item);

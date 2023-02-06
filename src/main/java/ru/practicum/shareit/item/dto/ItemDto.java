@@ -26,5 +26,4 @@ public class ItemDto {
             message = "Статус не может быть пустым")
     private Boolean available;
     private Long owner;
-    private ItemRequest request;
 }

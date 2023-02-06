@@ -13,6 +13,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.NotValidDataException;
 import ru.practicum.shareit.exception.BookingNotFoundException;
+import ru.practicum.shareit.exception.StatusNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -85,7 +86,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findUserBookingByStatus(bookerId, bookingState)
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             default:
-                throw new NotValidDataException(String.format(
+                throw new StatusNotFoundException(String.format(
                         "Unknown state: %s", bookingState));
         }
     }
@@ -112,7 +113,7 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findItemBookingByStatus(ownerId, bookingState)
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             default:
-                throw new NotValidDataException(String.format(
+                throw new StatusNotFoundException(String.format(
                         "Unknown state: %s", bookingState));
         }
     }

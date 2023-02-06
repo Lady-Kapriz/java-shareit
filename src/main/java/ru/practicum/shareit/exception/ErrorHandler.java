@@ -62,4 +62,11 @@ public class ErrorHandler {
         log.error(NOT_VALID_DATA_MESSAGE, e.getMessage());
         return new ErrorResponse(NOT_VALID_DATA_MESSAGE, e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleStatusNotFoundException(final StatusNotFoundException e) {
+        log.error(NOT_FOUND_MESSAGE, e.getMessage());
+        return new ErrorResponse(e.getMessage(), ERROR);
+    }
 }
