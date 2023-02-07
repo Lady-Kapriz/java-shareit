@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking.mapper;
 
+import lombok.experimental.UtilityClass;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -12,7 +13,7 @@ import ru.practicum.shareit.user.model.User;
 
 import static ru.practicum.shareit.booking.state.BookingState.WAITING;
 
-@Service
+@UtilityClass
 public class BookingMapper {
     public BookingDto bookingToBookingDto(Booking booking) {
         BookingDto bookingDto = new BookingDto();

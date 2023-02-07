@@ -25,7 +25,4 @@ public class Item {
     private Boolean available;
     @Column(name = "owner_id")
     private Long owner;
-    /*@ManyToOne
-    @JoinColumn(name = "request_id", referencedColumnName = "id")
-    private ItemRequest request;*/
 }

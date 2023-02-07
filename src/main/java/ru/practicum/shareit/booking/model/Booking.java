@@ -37,5 +37,6 @@ public class Booking {
     private User booker;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private BookingState status;
 }

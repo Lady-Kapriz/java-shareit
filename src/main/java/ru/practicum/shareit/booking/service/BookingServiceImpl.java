@@ -31,13 +31,12 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserService userService;
     private final ItemService itemService;
-    private final BookingMapper bookingMapper;
 
     @Override
     public BookingDto getById(Long bookingId, Long ownerId) {
         Booking booking = findById(bookingId);
         checkDataOf(booking, ownerId);
-        return bookingMapper.bookingToBookingDto(booking);
+        return BookingMapper.bookingToBookingDto(booking);
     }
 
     @Transactional
@@ -49,8 +48,8 @@ public class BookingServiceImpl implements BookingService {
         checkOwnerForItem(itemDto, userId);
         checkDate(bookingCreateDto);
         bookingCreateDto.setBookerId(userId);
-        return bookingMapper.bookingToBookingDto(bookingRepository.save(
-                bookingMapper.bookingCreateDtoToBooking(bookingCreateDto, itemDto)));
+        return BookingMapper.bookingToBookingDto(bookingRepository.save(
+                BookingMapper.bookingCreateDtoToBooking(bookingCreateDto, itemDto)));
     }
 
     @Transactional
@@ -59,7 +58,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = findById(bookingId);
         checkOwnerForItem(booking, ownerId);
         checkApprove(booking);
-        return bookingMapper.bookingToBookingDto(updateConfirmation(booking, approved));
+        return BookingMapper.bookingToBookingDto(updateConfirmation(booking, approved));
     }
 
     @Override
@@ -69,20 +68,20 @@ public class BookingServiceImpl implements BookingService {
             case ALL:
                 final Sort sort = Sort.by(Sort.Direction.DESC, "start");
                 return bookingRepository.findUserBookingById(bookerId, sort).stream()
-                        .map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case CURRENT:
                 return bookingRepository.findUserBookingByCurrent(bookerId, LocalDateTime.now())
-                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .stream().map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case PAST:
                 return bookingRepository.findUserBookingByPast(bookerId, LocalDateTime.now())
-                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .stream().map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case FUTURE:
                 return bookingRepository.findUserBookingByFuture(bookerId, LocalDateTime.now())
-                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .stream().map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case WAITING:
             case REJECTED:
                 return bookingRepository.findUserBookingByStatus(bookerId, bookingState)
-                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .stream().map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             default:
                 throw new StatusNotFoundException(String.format(
                         "Unknown state: %s", bookingState));
@@ -95,20 +94,20 @@ public class BookingServiceImpl implements BookingService {
         switch (bookingState) {
             case ALL:
                 return bookingRepository.findItemBookingById(ownerId)
-                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .stream().map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case CURRENT:
                 return bookingRepository.findItemBookingByCurrent(ownerId, LocalDateTime.now())
-                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .stream().map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case PAST:
                 return bookingRepository.findItemBookingByPast(ownerId, LocalDateTime.now())
-                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .stream().map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case FUTURE:
                 return bookingRepository.findItemBookingByFuture(ownerId, LocalDateTime.now())
-                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .stream().map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case WAITING:
             case REJECTED:
                 return bookingRepository.findItemBookingByStatus(ownerId, bookingState)
-                        .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
+                        .stream().map(BookingMapper::bookingToBookingDto).collect(Collectors.toList());
             default:
                 throw new StatusNotFoundException(String.format(
                         "Unknown state: %s", bookingState));

@@ -36,7 +36,6 @@ import static ru.practicum.shareit.util.Constants.CURRENT_DATA_TIME;
 @Transactional(readOnly = true)
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
-    private final ItemMapper itemMapper;
     private final UserService userService;
     private final UserMapper userMapper;
     private final CommentRepository commentRepository;
@@ -58,7 +57,7 @@ public class ItemServiceImpl implements ItemService {
                 new ArrayList<>();
         for (Item item : items) {
             List<Booking> bookings = bookingsMap.getOrDefault(item, List.of());
-            itemDtoGetResponses.add(itemMapper
+            itemDtoGetResponses.add(ItemMapper
                     .toItemDtoForBookingAndCommentShort(item, getLastBooking(bookings, item, ownerId),
                             getNextBooking(bookings, item, ownerId),
                             extractionComment(commentsMap, item)));
@@ -68,7 +67,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getItemById(Long itemId) {
-        return itemMapper.itemToItemDto(findItemById(itemId));
+        return ItemMapper.itemToItemDto(findItemById(itemId));
     }
 
     @Override
@@ -77,7 +76,7 @@ public class ItemServiceImpl implements ItemService {
             return Collections.emptyList();
         }
         return itemRepository.search(text).stream()
-                .map(itemMapper::itemToItemDto)
+                .map(ItemMapper::itemToItemDto)
                 .collect(toList());
     }
 
@@ -88,10 +87,10 @@ public class ItemServiceImpl implements ItemService {
                 .findByItemIdAndStatus(itemId, APPROVED, Sort.by(DESC, "start"));
         List<CommentDto> comments = commentRepository
                 .findByItemId(itemId, Sort.by(ASC, "created"))
-                .stream().map(itemMapper::commentToCommentDto).collect(toList());
+                .stream().map(ItemMapper::commentToCommentDto).collect(toList());
         BookingDtoForItem lastBooking = getLastBooking(bookings, item, ownerId);
         BookingDtoForItem nextBooking = getNextBooking(bookings, item, ownerId);
-        return itemMapper.toItemDtoForBookingAndCommentShort(item, lastBooking, nextBooking, comments);
+        return ItemMapper.toItemDtoForBookingAndCommentShort(item, lastBooking, nextBooking, comments);
     }
 
     @Transactional
@@ -101,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
         User author = userMapper.mapToUser(userService.getById(ownerId));
         Item item = findItemById(itemId);
         checkUserBooking(ownerId, itemId);
-        return itemMapper.commentToCommentDto(commentRepository
+        return ItemMapper.commentToCommentDto(commentRepository
                 .save(updateCommentData(commentDto, author, item)));
     }
 
@@ -110,7 +109,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(ItemDto itemDto, Long ownerId) {
         itemDto.setOwner(ownerId);
         userService.getById(ownerId);
-        itemDto.setId(itemRepository.save(itemMapper.itemDtoToItem(itemDto)).getId());
+        itemDto.setId(itemRepository.save(ItemMapper.itemDtoToItem(itemDto)).getId());
         return itemDto;
     }
 
@@ -121,8 +120,8 @@ public class ItemServiceImpl implements ItemService {
         itemDto.setOwner(ownerId);
         checkOwner(itemDto, ownerId);
         Item itemOld = findItemById(itemId);
-        Item itemNew = itemMapper.itemDtoToItem(itemDto);
-        return itemMapper.itemToItemDto(updateItemData(itemNew, itemOld));
+        Item itemNew = ItemMapper.itemDtoToItem(itemDto);
+        return ItemMapper.itemToItemDto(updateItemData(itemNew, itemOld));
     }
 
     private BookingDtoForItem getLastBooking(List<Booking> bookings, Item item, Long ownerId) {
@@ -131,7 +130,7 @@ public class ItemServiceImpl implements ItemService {
         if (lastBooking.isEmpty() || !item.getOwner().equals(ownerId)) {
             return null;
         }
-        return itemMapper.toBookingDtoForItem(lastBooking.get());
+        return ItemMapper.toBookingDtoForItem(lastBooking.get());
     }
 
     private BookingDtoForItem getNextBooking(List<Booking> bookings, Item item, Long ownerId) {
@@ -140,14 +139,14 @@ public class ItemServiceImpl implements ItemService {
         if (nextBooking.isEmpty() || !item.getOwner().equals(ownerId)) {
             return null;
         }
-        return itemMapper.toBookingDtoForItem(nextBooking.get());
+        return ItemMapper.toBookingDtoForItem(nextBooking.get());
     }
 
     private List<CommentDto> extractionComment(Map<Item, List<Comment>> commentsMap, Item item) {
         List<CommentDto> comments = List.of();
         if (!commentsMap.isEmpty()) {
             comments = commentsMap.get(item).stream()
-                    .map(itemMapper::commentToCommentDto)
+                    .map(ItemMapper::commentToCommentDto)
                     .collect(toList());
         }
         return comments;
@@ -188,7 +187,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private Comment updateCommentData(CommentDto commentDto, User author, Item item) {
-        Comment comment = itemMapper.commentDtoToComment(commentDto);
+        Comment comment = ItemMapper.commentDtoToComment(commentDto);
         comment.setId(commentDto.getId());
         comment.setCreated(commentDto.getCreated());
         comment.setAuthor(author);

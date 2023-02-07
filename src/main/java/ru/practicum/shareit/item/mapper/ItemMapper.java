@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.mapper;
 
+import lombok.experimental.UtilityClass;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 import ru.practicum.shareit.booking.model.Booking;
@@ -12,7 +13,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-@Service
+@UtilityClass
 public class ItemMapper {
     public Item itemDtoToItem(ItemDto itemDto) {
         Item item = new Item();
