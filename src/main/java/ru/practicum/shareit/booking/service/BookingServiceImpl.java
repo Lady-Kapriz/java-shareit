@@ -19,11 +19,11 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import static ru.practicum.shareit.booking.state.BookingState.APPROVED;
 import static ru.practicum.shareit.booking.state.BookingState.REJECTED;
-import static ru.practicum.shareit.util.Constants.CURRENT_DATA_TIME;
 
 @Slf4j
 @Service
@@ -73,13 +73,13 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findUserBookingById(bookerId, sort).stream()
                         .map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case CURRENT:
-                return bookingRepository.findUserBookingByCurrent(bookerId, CURRENT_DATA_TIME)
+                return bookingRepository.findUserBookingByCurrent(bookerId, LocalDateTime.now())
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case PAST:
-                return bookingRepository.findUserBookingByPast(bookerId, CURRENT_DATA_TIME)
+                return bookingRepository.findUserBookingByPast(bookerId, LocalDateTime.now())
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case FUTURE:
-                return bookingRepository.findUserBookingByFuture(bookerId, CURRENT_DATA_TIME)
+                return bookingRepository.findUserBookingByFuture(bookerId, LocalDateTime.now())
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case WAITING:
             case REJECTED:
@@ -99,14 +99,15 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findItemBookingById(ownerId)
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case CURRENT:
-                return bookingRepository.findItemBookingByCurrent(ownerId, CURRENT_DATA_TIME)
+                log.info("получить список");
+                return bookingRepository.findItemBookingByCurrent(ownerId, LocalDateTime.now())
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case PAST:
-                return bookingRepository.findItemBookingByPast(ownerId, CURRENT_DATA_TIME)
+                return bookingRepository.findItemBookingByPast(ownerId, LocalDateTime.now())
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case FUTURE:
                 log.info("future");
-                return bookingRepository.findItemBookingByFuture(ownerId, CURRENT_DATA_TIME)
+                return bookingRepository.findItemBookingByFuture(ownerId, LocalDateTime.now())
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case WAITING:
             case REJECTED:
