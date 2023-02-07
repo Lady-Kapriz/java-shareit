@@ -1,7 +1,6 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +24,6 @@ import java.util.stream.Collectors;
 import static ru.practicum.shareit.booking.state.BookingState.APPROVED;
 import static ru.practicum.shareit.booking.state.BookingState.REJECTED;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -99,14 +97,12 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findItemBookingById(ownerId)
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case CURRENT:
-                log.info("получить список");
                 return bookingRepository.findItemBookingByCurrent(ownerId, LocalDateTime.now())
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case PAST:
                 return bookingRepository.findItemBookingByPast(ownerId, LocalDateTime.now())
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case FUTURE:
-                log.info("future");
                 return bookingRepository.findItemBookingByFuture(ownerId, LocalDateTime.now())
                         .stream().map(bookingMapper::bookingToBookingDto).collect(Collectors.toList());
             case WAITING:
@@ -126,7 +122,6 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private void checkDataOf(Booking booking, Long ownerId) {
-        log.info("чк дата");
         if (!booking.getItem().getOwner().equals(ownerId) &&
                 !booking.getBooker().getId().equals(ownerId)) {
             throw new BookingNotFoundException(String.format(
