@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import ru.practicum.shareit.markers.Marker;
-import ru.practicum.shareit.request.ItemRequest;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -26,5 +25,4 @@ public class ItemDto {
             message = "Статус не может быть пустым")
     private Boolean available;
     private Long owner;
-    private ItemRequest request;
 }

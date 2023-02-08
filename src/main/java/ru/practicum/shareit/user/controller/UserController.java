@@ -16,13 +16,13 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public Collection<UserDto> getAllUsers() {
-        return userService.getAllUsers();
+    public Collection<UserDto> getUsers() {
+        return userService.getAll();
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUserById(@PathVariable Long userId) {
-        return userService.getUserById(userId);
+    public UserDto getById(@PathVariable Long userId) {
+        return userService.getById(userId);
     }
 
     @PatchMapping("/{userId}")
