@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.markers.Marker;
@@ -16,17 +17,20 @@ import static ru.practicum.shareit.util.Constants.HEADER_USER_ID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/requests")
+@Slf4j
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
 
     @PostMapping
     public ItemRequestDtoOut createItemRequest(@RequestHeader(HEADER_USER_ID) Long ownerId,
                                                @RequestBody @Validated(Marker.Create.class) ItemRequestDto itemRequestDto) {
+        log.info("создаем запрос");
         return itemRequestService.createItemRequest(itemRequestDto, ownerId);
     }
 
     @GetMapping
     public Collection<ItemRequestDtoForGet> getAllByOwner(@RequestHeader(HEADER_USER_ID) Long ownerId) {
+        log.info("запрос для пользователя с id = {}", ownerId);
         return itemRequestService.getAllByOwner(ownerId);
     }
 

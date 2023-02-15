@@ -1,6 +1,7 @@
 package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -33,15 +34,18 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class ItemRequestServiceImpl implements ItemRequestService {
-    private ItemRepository itemRepository;
-    private ItemRequestRepository itemRequestRepository;
-    private UserService userService;
-    ItemRequestMapper itemRequestMapper;
+    private final ItemRepository itemRepository;
+    private final ItemRequestRepository itemRequestRepository;
+    private final UserService userService;
+    private final ItemRequestMapper itemRequestMapper;
 
     @Override
     public Collection<ItemRequestDtoForGet> getAllByOwner(Long ownerId) {
+        log.info("Проверяем пользователя");
         userService.getByIdForService(ownerId);
+        log.info("проверили пользователя");
         List<ItemRequest> requests = itemRequestRepository
                 .findByRequestorId(ownerId, Sort.by(DESC, "created"));
         Map<ItemRequest, List<Item>> itemsMap = itemRepository
@@ -71,9 +75,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 itemRequest, extractionItemFromList(items, itemRequest));
     }
 
+    @Transactional
     @Override
     public ItemRequestDtoOut createItemRequest(ItemRequestDto itemRequestDto, Long ownerId) {
+        log.info("проверяем юзера");
         User requestor = userService.getByIdForService(ownerId);
+        log.info("устанавливаем время");
         itemRequestDto.setCreated(LocalDateTime.now());
         itemRequestDto.setId(itemRequestRepository.save(
                 itemRequestMapper.toItemRequest(itemRequestDto, requestor)).getId());
@@ -82,10 +89,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     private List<ItemRequestDtoForGet> doOutForGetList(
             List<ItemRequest> requests, Map<ItemRequest, List<Item>> itemsMap) {
-        List<ItemRequestDtoForGet> itemRequestDtoOutForGets = new ArrayList<>();
-        requests.forEach(itemRequest -> itemRequestDtoOutForGets.add(itemRequestMapper
+        List<ItemRequestDtoForGet> itemRequestDtoForGets = new ArrayList<>();
+        requests.forEach(itemRequest -> itemRequestDtoForGets.add(itemRequestMapper
                 .toItemRequestDtoForGet(itemRequest, extractionItemFromMap(itemsMap, itemRequest))));
-        return itemRequestDtoOutForGets;
+        return itemRequestDtoForGets;
     }
 
     private List<ItemDtoForRequest> extractionItemFromMap(
