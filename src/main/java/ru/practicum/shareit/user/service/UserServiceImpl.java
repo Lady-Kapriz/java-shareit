@@ -34,6 +34,11 @@ public class UserServiceImpl implements UserService {
         return userMapper.mapToUserDto(findById(userId));
     }
 
+    @Override
+    public User getByIdForService(Long userId) {
+        return findById(userId);
+    }
+
     @Transactional
     @Override
     public UserDto create(UserDto userDto) {
