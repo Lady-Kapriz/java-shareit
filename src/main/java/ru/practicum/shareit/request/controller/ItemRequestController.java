@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.markers.Marker;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoForGet;
-import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
+import ru.practicum.shareit.request.dto.ItemRequestDtoForResponse;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.util.Collection;
@@ -20,13 +20,6 @@ import static ru.practicum.shareit.util.Constants.HEADER_USER_ID;
 @Slf4j
 public class ItemRequestController {
     private final ItemRequestService itemRequestService;
-
-    @PostMapping
-    public ItemRequestDtoOut createItemRequest(@RequestHeader(HEADER_USER_ID) Long ownerId,
-                                               @RequestBody @Validated(Marker.Create.class) ItemRequestDto itemRequestDto) {
-        log.info("создаем запрос");
-        return itemRequestService.createItemRequest(itemRequestDto, ownerId);
-    }
 
     @GetMapping
     public Collection<ItemRequestDtoForGet> getAllByOwner(@RequestHeader(HEADER_USER_ID) Long ownerId) {
@@ -42,8 +35,15 @@ public class ItemRequestController {
     }
 
     @GetMapping("/{requestId}")
-    public ItemRequestDtoForGet getItemRequestById(@RequestHeader(HEADER_USER_ID) Long userId,
-                                                   @PathVariable Long requestId) {
+    public ItemRequestDtoForGet getById(@RequestHeader(HEADER_USER_ID) Long userId,
+                                        @PathVariable Long requestId) {
         return itemRequestService.getById(requestId, userId);
+    }
+
+    @PostMapping
+    public ItemRequestDtoForResponse create(@RequestHeader(HEADER_USER_ID) Long ownerId,
+                                            @RequestBody @Validated(Marker.Create.class) ItemRequestDto itemRequestDto) {
+        log.info("создаем запрос");
+        return itemRequestService.createItemRequest(itemRequestDto, ownerId);
     }
 }

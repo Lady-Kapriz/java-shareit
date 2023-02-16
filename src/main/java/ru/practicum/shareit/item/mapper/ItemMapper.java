@@ -3,10 +3,7 @@ package ru.practicum.shareit.item.mapper;
 import lombok.experimental.UtilityClass;
 import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.dto.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemDtoForRequest;
-import ru.practicum.shareit.item.dto.ItemDtoGetResponse;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.model.ItemRequest;
@@ -36,29 +33,9 @@ public class ItemMapper {
         return itemDto;
     }
 
-    public Comment commentDtoToComment(CommentDto commentDto) {
-        Comment comment = new Comment();
-        User author = new User();
-        comment.setId(commentDto.getId());
-        comment.setText(commentDto.getText());
-        author.setName(commentDto.getAuthorName());
-        comment.setAuthor(author);
-        comment.setCreated(commentDto.getCreated());
-        return comment;
-    }
-
-    public CommentDto commentToCommentDto(Comment comment) {
-        CommentDto commentDto = new CommentDto();
-        commentDto.setId(comment.getId());
-        commentDto.setText(comment.getText());
-        commentDto.setAuthorName(comment.getAuthor().getName());
-        commentDto.setCreated(comment.getCreated());
-        return commentDto;
-    }
-
     public ItemDtoGetResponse toItemDtoForBookingAndCommentShort(
             Item item, BookingDtoForItem lastBookingDto,
-            BookingDtoForItem nextBookingDto, List<CommentDto> commentsDto) {
+            BookingDtoForItem nextBookingDto, List<CommentDtoForResponse> commentDtoForResponses) {
         ItemDtoGetResponse itemDtoGetResponse =
                 new ItemDtoGetResponse();
         itemDtoGetResponse.setId(item.getId());
@@ -67,7 +44,7 @@ public class ItemMapper {
         itemDtoGetResponse.setAvailable(item.getAvailable());
         itemDtoGetResponse.setLastBooking(lastBookingDto);
         itemDtoGetResponse.setNextBooking(nextBookingDto);
-        itemDtoGetResponse.setComments(commentsDto);
+        itemDtoGetResponse.setComments(commentDtoForResponses);
         return itemDtoGetResponse;
     }
 
@@ -86,5 +63,31 @@ public class ItemMapper {
         itemDtoOutForRequest.setAvailable(item.getAvailable());
         itemDtoOutForRequest.setRequestId(itemRequest.getId());
         return itemDtoOutForRequest;
+    }
+
+    public CommentDtoForResponse commentToCommentDtoForResponse(Comment comment) {
+        CommentDtoForResponse commentDtoForResponse = new CommentDtoForResponse();
+        commentDtoForResponse.setId(comment.getId());
+        commentDtoForResponse.setText(comment.getText());
+        commentDtoForResponse.setAuthorName(comment.getAuthor().getName());
+        commentDtoForResponse.setCreated(comment.getCreated());
+        return commentDtoForResponse;
+    }
+
+    public Comment commentDtoToComment(CommentDtoForResponse commentDtoForResponse, User author, Item item) {
+        Comment comment = new Comment();
+        comment.setId(commentDtoForResponse.getId());
+        comment.setText(commentDtoForResponse.getText());
+        comment.setItem(item);
+        comment.setAuthor(author);
+        comment.setCreated(commentDtoForResponse.getCreated());
+        return comment;
+    }
+
+    public CommentDtoForResponse commentDtoToCommentDtoForResponse(CommentDto commentDto) {
+        CommentDtoForResponse commentDtoForResponse = new CommentDtoForResponse();
+        commentDtoForResponse.setId(commentDto.getId());
+        commentDtoForResponse.setText(commentDto.getText());
+        return commentDtoForResponse;
     }
 }

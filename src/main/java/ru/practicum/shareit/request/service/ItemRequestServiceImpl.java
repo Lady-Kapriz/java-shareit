@@ -13,7 +13,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoForGet;
-import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
+import ru.practicum.shareit.request.dto.ItemRequestDtoForResponse;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
@@ -41,6 +41,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final UserService userService;
     private final ItemRequestMapper itemRequestMapper;
 
+    @Transactional
     @Override
     public Collection<ItemRequestDtoForGet> getAllByOwner(Long ownerId) {
         log.info("Проверяем пользователя");
@@ -48,8 +49,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         log.info("проверили пользователя");
         List<ItemRequest> requests = itemRequestRepository
                 .findByRequestorId(ownerId, Sort.by(DESC, "created"));
-        Map<ItemRequest, List<Item>> itemsMap = itemRepository
-                .findByRequestIn(requests, Sort.by(ASC, "id")).stream()
+        log.info("запрашиваем requests: {}", requests);
+        List<Item> listRequests = itemRepository
+                .findByRequestIn(requests, Sort.by(ASC, "id"));
+        log.info("запрашиваем список items для requests: {}", listRequests);
+        Map<ItemRequest, List<Item>> itemsMap = listRequests.stream()
                 .collect(groupingBy(Item::getRequest, toList()));
         return doOutForGetList(requests, itemsMap);
     }
@@ -77,14 +81,14 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Transactional
     @Override
-    public ItemRequestDtoOut createItemRequest(ItemRequestDto itemRequestDto, Long ownerId) {
+    public ItemRequestDtoForResponse createItemRequest(ItemRequestDto itemRequestDto, Long ownerId) {
         log.info("проверяем юзера");
         User requestor = userService.getByIdForService(ownerId);
         log.info("устанавливаем время");
         itemRequestDto.setCreated(LocalDateTime.now());
         itemRequestDto.setId(itemRequestRepository.save(
                 itemRequestMapper.toItemRequest(itemRequestDto, requestor)).getId());
-        return itemRequestMapper.toItemRequestDtoOut(itemRequestDto);
+        return itemRequestMapper.toItemRequestDtoForResponse(itemRequestDto);
     }
 
     private List<ItemRequestDtoForGet> doOutForGetList(

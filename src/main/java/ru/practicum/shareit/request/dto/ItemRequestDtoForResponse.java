@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class ItemRequestDtoOut {
+public class ItemRequestDtoForResponse {
     private Long id;
     private String description;
     private LocalDateTime created;

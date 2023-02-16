@@ -17,5 +17,5 @@ public class ItemDtoGetResponse {
     private Boolean available;
     private BookingDtoForItem lastBooking;
     private BookingDtoForItem nextBooking;
-    private List<CommentDto> comments;
+    private List<CommentDtoForResponse> comments;
 }

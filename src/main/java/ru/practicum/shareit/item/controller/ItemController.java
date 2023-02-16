@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoForResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoGetResponse;
 import ru.practicum.shareit.item.service.ItemService;
@@ -20,38 +21,42 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public Collection<ItemDtoGetResponse> getAllItems(@RequestHeader(HEADER_USER_ID) Long ownerId) {
-        return itemService.getAllForOwnerId(ownerId);
+    public Collection<ItemDtoGetResponse> getAll(@RequestHeader(HEADER_USER_ID) Long ownerId,
+                                                 @RequestParam(defaultValue = "0") Integer from,
+                                                 @RequestParam(defaultValue = "10") Integer size) {
+        return itemService.getAllForOwnerId(ownerId, from, size);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDtoGetResponse getItemByIdForBooking(@RequestHeader(HEADER_USER_ID) Long ownerId,
-                                         @PathVariable Long itemId) {
+    public ItemDtoGetResponse getById(@RequestHeader(HEADER_USER_ID) Long ownerId,
+                                      @PathVariable Long itemId) {
         return itemService.getItemByIdForBooking(itemId, ownerId);
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> findItems(@RequestParam String text) {
-        return itemService.findItems(text);
+    public Collection<ItemDto> findByText(@RequestParam String text,
+                                          @RequestParam(defaultValue = "0") Integer from,
+                                          @RequestParam(defaultValue = "10") Integer size) {
+        return itemService.findByText(text, from, size);
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader(HEADER_USER_ID) Long ownerId,
-                              @RequestBody @Validated(Marker.Create.class) ItemDto itemDto) {
-        return itemService.createItem(itemDto, ownerId);
+    public ItemDto create(@RequestHeader(HEADER_USER_ID) Long ownerId,
+                          @RequestBody @Validated(Marker.Create.class) ItemDto itemDto) {
+        return itemService.create(itemDto, ownerId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto updateItem(@PathVariable Long itemId,
-                              @RequestHeader(HEADER_USER_ID) Long ownerId,
+    public ItemDto updateItem(@RequestHeader(HEADER_USER_ID) Long ownerId,
+                              @PathVariable Long itemId,
                               @RequestBody @Validated(Marker.Update.class) ItemDto itemDto) {
         return itemService.updateItem(itemDto, ownerId, itemId);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto createComment(@RequestHeader(HEADER_USER_ID) Long ownerId,
-                                    @PathVariable Long itemId,
-                                    @RequestBody @Validated(Marker.Create.class) CommentDto commentDto) {
+    public CommentDtoForResponse createComment(@RequestHeader(HEADER_USER_ID) Long ownerId,
+                                               @PathVariable Long itemId,
+                                               @RequestBody @Validated(Marker.Create.class) CommentDto commentDto) {
         return itemService.createComment(itemId, ownerId, commentDto);
     }
 }

@@ -28,5 +28,5 @@ public class Item {
     private Long owner;
     @ManyToOne
     @JoinColumn(name = "request_id", referencedColumnName = "id")
-    private ItemRequest request;
+    ItemRequest request;
 }

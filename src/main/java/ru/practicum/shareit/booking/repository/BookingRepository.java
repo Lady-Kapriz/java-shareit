@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,62 +20,52 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findUserBookingItem(Long ownerId, LocalDateTime currentData);
 
     @Query("select booking from Booking booking " +
-            "where booking.booker.id = :bookerId " +
-            "and booking.status <> 'REJECTED' ")
-    List<Booking> findUserBookingById(Long bookerId, Sort sort);
+            "where booking.booker.id = :bookerId")
+    Page<Booking> findUserBookingById(Long bookerId, Pageable pageable);
 
     @Query("select booking from Booking booking " +
             "where booking.booker.id = :bookerId " +
-            "and :currentData between booking.start and booking.end " +
-            "order by booking.start desc")
-    List<Booking> findUserBookingByCurrent(Long bookerId, LocalDateTime currentData);
+            "and :currentData between booking.start and booking.end")
+    Page<Booking> findUserBookingByCurrent(Long bookerId, LocalDateTime currentData, Pageable pageable);
 
     @Query("select booking from Booking booking " +
             "where booking.booker.id = :bookerId " +
-            "and booking.end < :currentData " +
-            "order by booking.start desc")
-    List<Booking> findUserBookingByPast(Long bookerId, LocalDateTime currentData);
+            "and booking.end < :currentData")
+    Page<Booking> findUserBookingByPast(Long bookerId, LocalDateTime currentData, Pageable pageable);
 
     @Query("select booking from Booking booking " +
             "where booking.booker.id = :bookerId " +
-            "and booking.start > :currentData " +
-            "order by booking.start desc")
-    List<Booking> findUserBookingByFuture(Long bookerId, LocalDateTime currentData);
+            "and booking.start > :currentData")
+    Page<Booking> findUserBookingByFuture(Long bookerId, LocalDateTime currentData, Pageable pageable);
 
     @Query("select booking from Booking booking " +
             "where booking.booker.id = :bookerId " +
-            "and booking.status = :bookingStatus " +
-            "order by booking.start desc")
-    List<Booking> findUserBookingByStatus(Long bookerId, BookingState bookingStatus);
+            "and booking.status = :bookingStatus")
+    Page<Booking> findUserBookingByStatus(Long bookerId, BookingState bookingStatus, Pageable pageable);
+
+    @Query("select booking from Booking booking " +
+            "where booking.item.owner = :ownerId")
+    Page<Booking> findItemBookingById(Long ownerId, Pageable pageable);
 
     @Query("select booking from Booking booking " +
             "where booking.item.owner = :ownerId " +
-            "order by booking.start desc")
-    List<Booking> findItemBookingById(Long ownerId);
+            "and :currentData between booking.start and booking.end")
+    Page<Booking> findItemBookingByCurrent(Long ownerId, LocalDateTime currentData, Pageable pageable);
 
     @Query("select booking from Booking booking " +
             "where booking.item.owner = :ownerId " +
-            "and :currentData between booking.start and booking.end " +
-            "order by booking.start desc")
-    List<Booking> findItemBookingByCurrent(Long ownerId, LocalDateTime currentData);
+            "and booking.end < :currentData")
+    Page<Booking> findItemBookingByPast(Long ownerId, LocalDateTime currentData, Pageable pageable);
 
     @Query("select booking from Booking booking " +
             "where booking.item.owner = :ownerId " +
-            "and booking.end < :currentData " +
-            "order by booking.start desc")
-    List<Booking> findItemBookingByPast(Long ownerId, LocalDateTime currentData);
+            "and booking.start > :currentData")
+    Page<Booking> findItemBookingByFuture(Long ownerId, LocalDateTime currentData, Pageable pageable);
 
     @Query("select booking from Booking booking " +
             "where booking.item.owner = :ownerId " +
-            "and booking.start > :currentData " +
-            "order by booking.start desc")
-    List<Booking> findItemBookingByFuture(Long ownerId, LocalDateTime currentData);
-
-    @Query("select booking from Booking booking " +
-            "where booking.item.owner = :ownerId " +
-            "and booking.status = :status " +
-            "order by booking.start desc")
-    List<Booking> findItemBookingByStatus(Long ownerId, BookingState status);
+            "and booking.status = :status")
+    Page<Booking> findItemBookingByStatus(Long ownerId, BookingState status, Pageable pageable);
 
     Collection<Booking> findByItemInAndStatus(List<Item> items, BookingState status, Sort start);
 

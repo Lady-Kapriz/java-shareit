@@ -2,7 +2,7 @@ package ru.practicum.shareit.request.service;
 
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestDtoForGet;
-import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
+import ru.practicum.shareit.request.dto.ItemRequestDtoForResponse;
 
 import java.util.Collection;
 
@@ -13,5 +13,5 @@ public interface ItemRequestService {
 
     ItemRequestDtoForGet getById(Long requestId, Long userId);
 
-    ItemRequestDtoOut createItemRequest(ItemRequestDto itemRequestDto, Long ownerId);
+    ItemRequestDtoForResponse createItemRequest(ItemRequestDto itemRequestDto, Long ownerId);
 }
