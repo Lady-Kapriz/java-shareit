@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getByIdForService(Long userId) {
-        //validateId(userId);
+        validateId(userId);
         log.info("проверяем пользователя 2");
         return findById(userId);
     }
