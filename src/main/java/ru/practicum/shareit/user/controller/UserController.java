@@ -16,7 +16,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public Collection<UserDto> getUsers() {
+    public Collection<UserDto> getAll() {
         return userService.getAll();
     }
 
@@ -25,15 +25,15 @@ public class UserController {
         return userService.getById(userId);
     }
 
+    @PostMapping
+    public UserDto createUser(@RequestBody @Validated(Marker.Create.class) UserDto userDto) {
+        return userService.create(userDto);
+    }
+
     @PatchMapping("/{userId}")
     public UserDto updateUserById(@RequestBody @Validated(Marker.Update.class) UserDto userDto,
                                   @PathVariable Long userId) {
         return userService.update(userDto, userId);
-    }
-
-    @PostMapping
-    public UserDto createUser(@RequestBody @Validated(Marker.Create.class) UserDto userDto) {
-        return userService.create(userDto);
     }
 
     @DeleteMapping("/{userId}")

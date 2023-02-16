@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.NotValidDataException;
 import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoForResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoGetResponse;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -42,9 +44,9 @@ public class ItemServiceImpl implements ItemService {
     private final BookingRepository bookingRepository;
 
     @Override
-    public List<ItemDtoGetResponse> getAllForOwnerId(Long ownerId) {
+    public List<ItemDtoGetResponse> getAllForOwnerId(Long ownerId, Integer from, Integer size) {
         List<Item> items = itemRepository
-                .findByOwner(ownerId, Sort.by(ASC, "id"));
+                .findByOwner(ownerId, PageRequest.of(from, size, Sort.by(ASC, "id")));
         Map<Item, List<Comment>> commentsMap = commentRepository
                 .findByItemIn(items, Sort.by(ASC, "created"))
                 .stream()
@@ -71,11 +73,11 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Collection<ItemDto> findItems(String text) {
+    public Collection<ItemDto> findByText(String text, Integer from, Integer size) {
         if (text == null || text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemRepository.search(text).stream()
+        return itemRepository.search(text, PageRequest.of(from, size)).stream()
                 .map(ItemMapper::itemToItemDto)
                 .collect(toList());
     }
@@ -85,9 +87,9 @@ public class ItemServiceImpl implements ItemService {
         Item item = findItemById(itemId);
         List<Booking> bookings = bookingRepository
                 .findByItemIdAndStatus(itemId, APPROVED, Sort.by(DESC, "start"));
-        List<CommentDto> comments = commentRepository
+        List<CommentDtoForResponse> comments = commentRepository
                 .findByItemId(itemId, Sort.by(ASC, "created"))
-                .stream().map(ItemMapper::commentToCommentDto).collect(toList());
+                .stream().map(ItemMapper::commentToCommentDtoForResponse).collect(toList());
         BookingDtoForItem lastBooking = getLastBooking(bookings, item, ownerId);
         BookingDtoForItem nextBooking = getNextBooking(bookings, item, ownerId);
         return ItemMapper.toItemDtoForBookingAndCommentShort(item, lastBooking, nextBooking, comments);
@@ -95,18 +97,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     @Override
-    public CommentDto createComment(Long itemId, Long ownerId, CommentDto commentDto) {
-        commentDto.setCreated(CURRENT_DATA_TIME);
+    public CommentDtoForResponse createComment(Long itemId, Long ownerId, CommentDto commentDto) {
+        CommentDtoForResponse commentDtoForResponse = ItemMapper.commentDtoToCommentDtoForResponse(commentDto);
+        commentDtoForResponse.setCreated(CURRENT_DATA_TIME);
         User author = userMapper.mapToUser(userService.getById(ownerId));
         Item item = findItemById(itemId);
         checkUserBooking(ownerId, itemId);
-        return ItemMapper.commentToCommentDto(commentRepository
-                .save(updateCommentData(commentDto, author, item)));
+        return ItemMapper.commentToCommentDtoForResponse(commentRepository.save(ItemMapper
+                .commentDtoToComment(commentDtoForResponse, author, item)));
     }
 
     @Transactional
     @Override
-    public ItemDto createItem(ItemDto itemDto, Long ownerId) {
+    public ItemDto create(ItemDto itemDto, Long ownerId) {
         itemDto.setOwner(ownerId);
         userService.getById(ownerId);
         itemDto.setId(itemRepository.save(ItemMapper.itemDtoToItem(itemDto)).getId());
@@ -142,11 +145,11 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toBookingDtoForItem(nextBooking.get());
     }
 
-    private List<CommentDto> extractionComment(Map<Item, List<Comment>> commentsMap, Item item) {
-        List<CommentDto> comments = List.of();
+    private List<CommentDtoForResponse> extractionComment(Map<Item, List<Comment>> commentsMap, Item item) {
+        List<CommentDtoForResponse> comments = List.of();
         if (!commentsMap.isEmpty()) {
             comments = commentsMap.get(item).stream()
-                    .map(ItemMapper::commentToCommentDto)
+                    .map(ItemMapper::commentToCommentDtoForResponse)
                     .collect(toList());
         }
         return comments;
@@ -184,14 +187,5 @@ public class ItemServiceImpl implements ItemService {
             throw new NotValidDataException(String.format(
                     "Пользователь с id: %s не брал в аренду вещь с id: %s", ownerId, itemId));
         }
-    }
-
-    private Comment updateCommentData(CommentDto commentDto, User author, Item item) {
-        Comment comment = ItemMapper.commentDtoToComment(commentDto);
-        comment.setId(commentDto.getId());
-        comment.setCreated(commentDto.getCreated());
-        comment.setAuthor(author);
-        comment.setItem(item);
-        return comment;
     }
 }

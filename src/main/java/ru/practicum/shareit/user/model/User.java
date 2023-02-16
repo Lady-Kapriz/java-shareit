@@ -7,8 +7,6 @@ import javax.validation.constraints.Email;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @ToString
 @EqualsAndHashCode(of = "id")
 @Entity

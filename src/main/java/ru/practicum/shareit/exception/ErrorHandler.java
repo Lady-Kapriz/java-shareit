@@ -37,6 +37,13 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleRequestNotFoundException(final RequestNotFoundException e) {
+        log.error(NOT_FOUND_MESSAGE, e.getMessage());
+        return new ErrorResponse(NOT_FOUND_MESSAGE, e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleItemNotFoundException(final ItemNotFoundException e) {
         log.error(NOT_FOUND_MESSAGE, e.getMessage());
         return new ErrorResponse(NOT_FOUND_MESSAGE, e.getMessage());

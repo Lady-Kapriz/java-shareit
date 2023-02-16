@@ -1,7 +1,7 @@
 DELETE FROM comments;
-DELETE FROM requests;
 DELETE FROM bookings;
 DELETE FROM items;
+DELETE FROM requests;
 DELETE FROM users;
 
 ALTER TABLE comments ALTER COLUMN ID RESTART WITH 1;

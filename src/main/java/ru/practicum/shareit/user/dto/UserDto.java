@@ -11,14 +11,15 @@ import javax.validation.constraints.NotBlank;
 @Setter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(of = "id")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto {
     private Long id;
+
     @NotBlank(groups = {Marker.Create.class},
             message = "Имя пользователя не может быть пустым")
     private String name;
+
     @NotBlank(groups = {Marker.Create.class},
             message = "Email не может быть пустым")
     @Email(groups = {Marker.Create.class, Marker.Update.class},

@@ -9,11 +9,13 @@ import java.util.List;
 public interface BookingService {
     BookingDto getById(Long bookingId, Long ownerId);
 
+    List<BookingDto> getUserByStateParam(Long bookerId, BookingState bookingState,
+                                         Integer from, Integer size);
+
     BookingDto create(BookingCreateDto bookingCreateDto, Long userId);
 
     BookingDto confirmation(Long ownerId, Long bookingId, Boolean approved);
 
-    List<BookingDto> getUserByStateParam(Long bookerId, BookingState bookingState);
-
-    List<BookingDto> getItemByStateParam(Long ownerId, BookingState bookingState);
+    List<BookingDto> getItemByStateParam(Long ownerId, BookingState bookingState,
+                                         Integer from, Integer size);
 }

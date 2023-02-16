@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.UserAlreadyExistsException;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -32,6 +34,13 @@ public class UserServiceImpl implements UserService {
     public UserDto getById(Long userId) {
         validateId(userId);
         return userMapper.mapToUserDto(findById(userId));
+    }
+
+    @Override
+    public User getByIdForService(Long userId) {
+        validateId(userId);
+        log.info("проверяем пользователя 2");
+        return findById(userId);
     }
 
     @Transactional
@@ -62,6 +71,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User findById(Long userId) {
+        log.info("Запрос пользователя из БД");
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(
                         String.format("Пользователь с id: %s не найден", userId)));
